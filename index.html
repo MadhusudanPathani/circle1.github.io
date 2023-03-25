@@ -1,56 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Circle Plotter</title>
+	<title>Monte Carlo Simulation</title>
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-	<h1>Circle Plotter</h1>
-	<form>
-		<label for="radius">Radius:</label>
-		<input type="number" id="radius" name="radius" value="1"><br><br>
-		<button type="button" onclick="plot()">Plot Circle</button>
-	</form>
-
+	<h1>Monte Carlo Simulation</h1>
 	<div id="plot"></div>
 
 	<script>
-		function plot() {
-			var radius = parseFloat(document.getElementById("radius").value);
-			var theta = [];
-			var x = [];
-			var y = [];
+		var pythonCode = `import matplotlib.pyplot as plt
+import random
+import numpy as np
 
-			for (var i = 0; i <= 360; i++) {
-				theta.push(i);
-				x.push(radius * Math.cos(i * Math.PI / 180));
-				y.push(radius * Math.sin(i * Math.PI / 180));
-			}
+rlist1=[]
+rlist2=[]
 
-			var trace = {
-				x: x,
-				y: y,
-				mode: 'markers',
-				marker: {
-					size: 5,
-					color: 'blue'
-				}
-			};
+while len(rlist1)<100 or len(rlist2)<100:
+    if len(rlist1)<100:
+        r=random.randint(1,100)
+        if r not in rlist1:
+            rlist1.append(r)
+    if len(rlist2)<100:
+        r=random.randint(1,100)
+        if r not in rlist2:
+            rlist2.append(r)
+    
+x=np.array(rlist1)
+y=np.array(rlist2)
 
-			var data = [trace];
+plt.title('Monte carlo')
+plt.scatter(x,y)
+circle = plt.Circle((50, 50), 50, color='r', fill=False)
+plt.gca().add_artist(circle)
+d = np.sqrt((x - 50) ** 2 + (y - 50) ** 2)  # distance from each point to the center
+n_inside = np.sum(d <= 50)
+n_outside = np.sum(d > 50)
 
-			var layout = {
-				title: 'Circle Plot',
-				xaxis: {
-					title: 'X Axis'
-				},
-				yaxis: {
-					title: 'Y Axis'
-				}
-			};
+console.log("Number of points inside the circle: " + n_inside)
+console.log("Number of points outside the circle: " + n_outside)
 
-			Plotly.newPlot('plot', data, layout);
-		}
+console.log(4*(n_outside/n_inside))
+
+plt.show()`;
+
+		pyodide.runPython(pythonCode)
 	</script>
 </body>
 </html>
